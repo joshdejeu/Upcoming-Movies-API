@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{pageTitle}}</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Code by Josh Dejeu -->
+    <div id="mainContainer">
+        <div id="bigPicCont">
+            <div id="bigPic">
+                <div id="moviePic">
+                    <img v-bind:src="image" id="img">
+                </div>
+                <div id="movieInfo">
+                    <div id="info1"><h2>{{title}}</h2></div>
+                    <div id="info2"><h4>{{desc}}</h4></div>
+                    <div id="info3"><h3>{{rating}}</h3><div id="stars">★★★★★★★★★☆</div></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="smallPicCont">
+            <div id="newMovie" v-for="movie in movies">
+                <movie @secondadult="addAdult" @secondchild="addChild" :source="movie.poster_path" :title="movie.title" :desc="movie.overview" :obj="movie"></movie>
+            </div>
+        </div>
+
+        <!-- all movie ticket purchases show up here -->
+        <div id="sum_template">
+            <sumarray 
+            v-for="item in totalPurchased"
+            :source="item.poster_path" 
+            :title="item.title"
+            :type="item.title"
+            :amount="item.title"></sumarray>
+        </div>
+    </div>
+
+    <!-- contains tickets that fly to cart -->
+    <div id="o_container"></div>
+
+    <!-- movie ticket summary -->
+    <div id="summary">
+        <div id="sum_amount"></div>
+    </div>
+    <!-- <div id="sum_template">
+        <summary v-for="mov in movies" titles="test"></summary>
+    </div> -->
+    <div id="blur"></div>
+
+
+
+    <!-- not related to assignment -->
+    <div id="sliders">
+        <p>Light Mode</p>
+        <div @click="changeMode" id="night">
+            <div id="toggle">{{mode}}</div>
+        </div>
+    
+        <p>Info on Top</p>
+        <div @click="changeInfo" id="txt">
+            <div id="toggle">{{info}}</div>
+        </div>
+
+        <div id="infoC">i</div>
+        <div id="infoD">Hover over the big picture to display movie information. Or use the sliders to customize the view.</div>
+    </div>
+
+    
+    <script src="js/script.js"></script>
+
+    <!-- all extra javascript not related to assignemnt -->
+    <script src="js/extra.js"></script>
+</body>
+</html>
