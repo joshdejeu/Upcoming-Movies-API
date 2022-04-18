@@ -381,7 +381,7 @@ h6{
     height: 90px;
     z-index: 1;
     border-radius: 10px;
-    background-color: rgba(255, 255, 255, 0.76);
+    background-color: rgba(255, 255, 255, 0.9);
     backdrop-filter: blur(2px);
     animation: 0.2s ticket linear forwards;
 
@@ -408,7 +408,7 @@ h6{
 }
 #h3{
     font-size: 15px;
-    color: red;
+    color: black;
     font-weight: bold;
 }
 #h4{
@@ -419,18 +419,32 @@ h6{
     width: 40%;
     height: 100%;
     margin-top: 5px;
-    padding-bottom: 5px;
-    padding-top: 5px;
+    padding-bottom: 4px;
+    padding-top: 4px;
     border: none;
-    color: white;
-    border-radius: 3px;
+    border-radius: 15px;
     cursor: pointer;
+    transition: all 0.2s ease;
 }
 #tick:nth-child(1){
-    background-color: rgb(187, 55, 55);
+    background-color: inherit;
+    border: 2px solid black;
+    color: black;
 }#tick:nth-child(2){
-    background-color: rgb(98, 108, 250);
+    background-color: black;
+    color: white;
 }
+
+#tick:nth-child(1):active{
+    background-color: rgb(255,255,255);
+    border: 2px solid black;
+    color: black;
+}#tick:nth-child(2):active{
+    background-color: rgba(0, 0, 0, 0.767);
+    color: white;
+}
+
+
 .o{
     position: absolute;
     top: 0;

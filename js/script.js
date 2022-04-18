@@ -10,17 +10,17 @@ Vue.component("sumarray",{
         <div>
             <h6>{{title}}</h6>
         </div>
-
-        <div>
-            <h6>{{type}}</h6>
-        </div>
         
         <div>
-            <h6>{{amount}}</h6>
+            <h6>Adult Tickets: {{adultamt}}</h6>
+        </div>
+
+        <div>
+            <h6>Child Tickets: {{childamt}}</h6>
         </div>
     </div>
     `,
-    props:['source','title','type','amount'],
+    props:['source','title','adultamt','childamt'],
     data(){
         return{
             concact: "https://image.tmdb.org/t/p/w500",
@@ -77,6 +77,8 @@ Vue.component("ticket",{
 });
 
 
+// these are the movie cards under the big picture
+
 Vue.component("movie",{
     // container for each div created
     template:`
@@ -120,15 +122,32 @@ Vue.component("movie",{
 const movie = new Vue({
     el: "#mainContainer",
     data:{
+        // default values on load, should be changed asap to API
         pageTitle: "Upcoming Movies",
         image: "images/wardogs.png",
         title: "War Dogs",
         rating: "9.4/10",
         desc: "This movie goated",
+
+
+        // movie objects from every ADULT ticket purchase
         adultPurchased: [],
+        // movie objects from every CHILD ticket purchase
         childPurchased: [],
+        // movie objects from every ticket purchase
         totalPurchased: [],
+
+        tickets:{
+            // movie objects from every ticket purchase
+            tick_Object: [],
+            tick_Adult: 0,
+            tick_Child: 0,
+        },
+
+        // movie titles from every ticket purchases
         movieTitles: [],
+
+        // red notification by shopping cart
         ticketsBought: 0,
         movies:
         [
@@ -152,6 +171,7 @@ const movie = new Vue({
     },
     methods:{
         // push movie objects into arrays
+        // adult and child are the count of tickets for adult and child
         addAdult(obj, adult, child){
             this.adultPurchased.push(obj);
             this.totalPurchased.push(obj);
@@ -162,35 +182,46 @@ const movie = new Vue({
             this.totalPurchased.push(obj);
             this.checkRepeat();
         },
-        checkRepeat(){
+        checkRepeat(obj, adult, child){
+            idk = this.tickets.tick_Object;
+
+            // by default the movie does not exist in array before being checked
+            exists = false;
+
+            // for every item in ticket object array
+            for(i=0; i < idk.length; i++){
+                // console.log(this.tickets.tick_Object[i].title);
+                exits = false;
+                // if the current array includes the title of the
+                // object that was passed to it, dont add it
+                // array.includes(obj.title)
+                if(idk[i].title == obj.title){
+                    exists = true;
+                }else{
+                    exists = false;
+                }
+                console.log(exists);
+            }
+
+            if(!exists){
+                // movie title was not found in arry so we push this object to the array
+                this.tickets.tick_Object.push(obj);
+            }
+            this.tickets.tick_Adult = adult;
+            this.tickets.tick_Child = child;
+
             // update movie ticket amount (red circle by shopping cart)
             this.ticketsBought++;
+
+            // if less than 0 tickets, don't show notification
             var amt = document.getElementById('sum_amount');
             if(this.ticketsBought>0){amt.style.transform = "scale(1.0)";}
             else{amt.style.transform = "scale(0.0)";}
             amt.innerHTML = this.ticketsBought;
 
-            // put all purchased movie titles into an array then remove repeating values
-            console.log("Lenth of totalPurchased: ", this.totalPurchased.length)
+            
 
-            for(i=0;i<this.totalPurchased.length;i++){this.movieTitles.push(this.totalPurchased[i].title);}
-            console.log("Lenth of movieTitles: ", this.movieTitles.length)
-            uniqueTitles = [...new Set(this.movieTitles)];
 
-            for(i=0;i<this.movies.length;i++){
-                console.log("TITLE",this.movies[i].title)
-                console.log("UNIQUE",uniqueTitles[i],"\n")
-                console.log(typeof uniqueTitles[i] !== "undefined")
-                if(typeof uniqueTitles[i] !== "undefined" && this.movies[i].title == uniqueTitles[i]){
-                    console.log("Match found")
-                }else{
-                    break;
-                }
-            }
-
-            // this.totalPurchased = uniqueTitles;
-            console.log(uniqueTitles,"TAT");
-            console.log(this.totalPurchased)
 
         }
     }
