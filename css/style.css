@@ -212,7 +212,7 @@ h2,h3,h4{
     left: auto;
     right: auto;
     bottom: auto;
-    width: 500px;
+    width: 600px;
     height: 0px;
     border-radius: 20px;
     background-color: white;
@@ -458,4 +458,56 @@ h6{
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
+}
+#add_sub{
+    display: flex;
+    flex-direction: column;
+}
+#sub_btn,#add_btn{
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: none;
+    background-color: white;
+    border: 1px solid black;
+    font-size: 20px;
+    cursor: pointer;
+}
+#sub_btn:hover,#add_btn:hover{
+    transition: all 0.2s ease;
+}
+#sub_btn:hover{
+    background-color: rgb(255, 163, 163);
+}
+#add_btn:hover{
+    background-color: rgb(212, 255, 163);
+}
+
+
+#sub_btn:active,#add_btn:active{
+    color: white;
+    cursor: grabbing;
+}
+#sub_btn:active{
+    color: white;
+    background-color: rgb(255, 91, 91);
+    cursor: grabbing;
+}
+#add_btn:active{
+    color: white;
+    background-color: rgb(41, 180, 6);
+    cursor: grabbing;
+}
+
+
+#del{
+    cursor: pointer;
+    color: red;
+    text-decoration: underline;
+}
+#del:hover{
+    cursor: pointer;
+}
+#del:active{
+    cursor: grabbing;
 }

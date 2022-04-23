@@ -28,18 +28,21 @@
 
         <div id="smallPicCont">
             <div id="newMovie" v-for="movie in movies">
-                <movie @secondadult="checkRepeat" @secondchild="checkRepeat" :source="movie.poster_path" :title="movie.title" :desc="movie.overview" :obj="movie"></movie>
+                <movie @secondadult="updateCart" @secondchild="updateCart" :source="movie.poster_path" :title="movie.title" :desc="movie.overview" :obj="movie"></movie>
             </div>
         </div>
 
         <!-- all movie ticket purchases show up here -->
         <div id="sum_template">
             <sumarray 
-            v-for="item in tickets.tick_Object"
-            :source="item.poster_path" 
-            :title="item.title"
-            :adultamt="tickets.tick_Adult"
-            :childamt="tickets.tick_Child"></sumarray>
+            @tick_update="updateCart"
+            v-for="item in tickets"
+            :source="item.tick_src" 
+            :title="item.tick_title"
+            :adultamt="item.tick_Adult"
+            :childamt="item.tick_Child"
+            
+            :tickobj="item"></sumarray>
         </div>
     </div>
 

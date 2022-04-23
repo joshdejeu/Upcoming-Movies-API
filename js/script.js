@@ -11,23 +11,55 @@ Vue.component("sumarray",{
             <h6>{{title}}</h6>
         </div>
         
-        <div>
-            <h6>Adult Tickets: {{adultamt}}</h6>
+        <div id="add_sub">
+            <h6>Adult: {{adultamt}}</h6>
+            <div>
+                <input id="add_btn" type="button" value="+" @click="addAdult">
+                <input id="sub_btn" type="button" value="-" @click="subAdult">
+            </div>
+        </div>
+
+        <div id="add_sub">
+            <h6>Child: {{childamt}}</h6>
+            <div>
+                <input id="add_btn" type="button" value="+" @click="addChild">
+                <input id="sub_btn" type="button" value="-" @click="subChild">
+            </div>
         </div>
 
         <div>
-            <h6>Child Tickets: {{childamt}}</h6>
+            <h6 id="del" @click="remove">Remove</h6>
         </div>
     </div>
     `,
-    props:['source','title','adultamt','childamt'],
+    props:['source','title','adultamt','childamt','tickobj'],
     data(){
         return{
             concact: "https://image.tmdb.org/t/p/w500",
+            newAdult: this.adultamt,
+            newChild: this.childamt
         }
     },
     methods:{
-
+        addAdult(){
+            this.newAdult++;
+            this.$emit('tick_update', this.tickobj, this.newAdult, this.newChild, "fromCart");
+        },
+        subAdult(){
+            this.newAdult--;
+            this.$emit('tick_update', this.tickobj, this.newAdult, this.newChild, "fromCart");
+        },
+        addChild(){
+            this.newChild++;
+            this.$emit('tick_update', this.tickobj, this.newAdult, this.newChild, "fromCart");
+        },
+        subChild(){
+            this.newChild--;
+            this.$emit('tick_update', this.tickobj, this.newAdult, this.newChild, "fromCart");
+        },
+        remove(){
+            this.$emit('tick_update', this.tickobj, 1, 1, "delete");
+        }
     }
 })
 
@@ -128,23 +160,12 @@ const movie = new Vue({
         title: "War Dogs",
         rating: "9.4/10",
         desc: "This movie goated",
+        tickets:
+        [
+            // {tick_src: "", tick_title: "", tick_Adult: 0, tick_Child: 0,}
+        ],
 
-
-        // movie objects from every ADULT ticket purchase
-        adultPurchased: [],
-        // movie objects from every CHILD ticket purchase
-        childPurchased: [],
-        // movie objects from every ticket purchase
-        totalPurchased: [],
-
-        tickets:{
-            // movie objects from every ticket purchase
-            tick_Object: [],
-            tick_Adult: 0,
-            tick_Child: 0,
-        },
-
-        // movie titles from every ticket purchases
+        // movie titles from every ticket purchases 
         movieTitles: [],
 
         // red notification by shopping cart
@@ -170,60 +191,97 @@ const movie = new Vue({
         .catch(error=>{console.log(error);})
     },
     methods:{
-        // push movie objects into arrays
-        // adult and child are the count of tickets for adult and child
-        addAdult(obj, adult, child){
-            this.adultPurchased.push(obj);
-            this.totalPurchased.push(obj);
-            this.checkRepeat();
-        },
-        addChild(obj, adult, child){
-            this.childPurchased.push(obj);
-            this.totalPurchased.push(obj);
-            this.checkRepeat();
-        },
-        checkRepeat(obj, adult, child){
-            idk = this.tickets.tick_Object;
+        ticketUpdate(){
 
-            // by default the movie does not exist in array before being checked
-            exists = false;
+        },
+        updateCart(obj, adult, child, key){
+            const CONCACT = "https://image.tmdb.org/t/p/w500";
+            // Parameters: 
+            //      Object of movie, 
+            //      adult ticket count, 
+            //      child ticket count,
 
-            // for every item in ticket object array
-            for(i=0; i < idk.length; i++){
-                // console.log(this.tickets.tick_Object[i].title);
+            // create an summary object that contains:
+            //      movie img src,
+            //      movie tite,
+            //      adult ticket count,
+            //      child ticket count,
+
+            // Change source based on where function is called
+
+            // Use key as GPS to know where it was called from 
+            // objects has properties with different names for now
+            // alert("change obj property names to be the same") 
+            if(key=="fromCart" || key=="delete"){
+                var source = obj.tick_src;
+                var title = obj.tick_title;
+            }else{
+                var source = CONCACT+obj.poster_path;
+                var title = obj.title;
+            }
+
+
+
+            // Make sure tickets can't be below 0
+            if(adult<0){adult=0;}
+            if(child<0){child=0;}
+
+
+
+            var tick_obj = 
+            {
+                tick_src: source,
+                tick_title: title,
+                tick_Adult: adult,
+                tick_Child: child,
+            }
+            // 2) check every item in array for current movie title
+            for(i=0; i < this.tickets.length; i++){
                 exits = false;
-                // if the current array includes the title of the
-                // object that was passed to it, dont add it
-                // array.includes(obj.title)
-                if(idk[i].title == obj.title){
-                    exists = true;
-                }else{
-                    exists = false;
+                // 3) if current movie title matches a movie title from array
+                // 4) remove that current movie
+                if(this.tickets[i].tick_title == title){this.tickets.splice(i,1);}
+            }
+
+            // 5) update movie array with new movie object
+            this.tickets.push(tick_obj);
+
+            // If delete text was clicked
+            // for every movie in summary
+            // check title if it matches then delete
+            if(key=="delete"){
+                for(i=0; i<this.tickets.length; i++){
+
+                    if(this.tickets[i].tick_title == title){
+                        this.tickets.splice(i,1);
+                    }
                 }
-                console.log(exists);
             }
 
-            if(!exists){
-                // movie title was not found in arry so we push this object to the array
-                this.tickets.tick_Object.push(obj);
-            }
-            this.tickets.tick_Adult = adult;
-            this.tickets.tick_Child = child;
+            // If both adult tickets, and child tickets are 0
+            // then remove the movie from the summary
+            if(adult==0 && child==0){
+                // check if adult is 0 first then delete
+                //check if child is 0 then delete
+                for(i=0; i<this.tickets.length; i++){
+                    nowA = this.tickets[i].tick_Adult;
+                    nowC = this.tickets[i].tick_Child;
+                    if(nowA == 0 && nowC == 0){
+                        this.tickets.splice(i,1);
+                    }
 
-            // update movie ticket amount (red circle by shopping cart)
+                }
+            }
+            
+            // 6) update movie ticket amount (red circle by shopping cart)
             this.ticketsBought++;
 
-            // if less than 0 tickets, don't show notification
+            // 7) if less than 0 tickets purchased, don't show notification
             var amt = document.getElementById('sum_amount');
             if(this.ticketsBought>0){amt.style.transform = "scale(1.0)";}
             else{amt.style.transform = "scale(0.0)";}
             amt.innerHTML = this.ticketsBought;
-
-            
-
-
-
-        }
+        },
     }
 })
 
