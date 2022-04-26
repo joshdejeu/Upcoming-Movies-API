@@ -28,7 +28,13 @@
 
         <div id="smallPicCont">
             <div id="newMovie" v-for="movie in movies">
-                <movie @secondadult="updateCart" @secondchild="updateCart" :source="movie.poster_path" :title="movie.title" :desc="movie.overview" :obj="movie"></movie>
+                <movie 
+                @secondadult="updateCart" 
+                @secondchild="updateCart" 
+                :source="movie.poster_path" 
+                :title="movie.title" 
+                :desc="movie.overview" 
+                :obj="movie"></movie>
             </div>
         </div>
 
@@ -37,12 +43,12 @@
             <sumarray 
             @tick_update="updateCart"
             v-for="item in tickets"
-            :source="item.tick_src" 
-            :title="item.tick_title"
+            :source="item.poster_path" 
+            :title="item.title"
             :adultamt="item.tick_Adult"
             :childamt="item.tick_Child"
-            
-            :tickobj="item"></sumarray>
+            :tickobj="item"
+            :unique="item.id"></sumarray>
         </div>
     </div>
 
