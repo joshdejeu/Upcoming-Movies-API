@@ -42,24 +42,32 @@ Vue.component("sumarray",{
     },
     methods:{
         addAdult(){
+            var ind = movie.giot(this.title);
+            this.newAdult = movie.tickets[ind].tick_Adult;
             this.newAdult++;
             movie.ticketsBought++;
-            this.$emit('tick_update', this.tickobj, this.newAdult, this.newChild, "add");
+            this.$emit('tick_update', this.tickobj, this.newAdult, this.newChild, "fromSummary");
         },
         subAdult(){
+            var ind = movie.giot(this.title);
+            this.newAdult = movie.tickets[ind].tick_Adult;
             this.newAdult--;
             movie.ticketsBought--;
-            this.$emit('tick_update', this.tickobj, this.newAdult, this.newChild, "sub");
+            this.$emit('tick_update', this.tickobj, this.newAdult, this.newChild, "fromSummary");
         },
         addChild(){
+            var ind = movie.giot(this.title);
+            this.newChild = movie.tickets[ind].tick_Child;
             this.newChild++;
             movie.ticketsBought++;
-            this.$emit('tick_update', this.tickobj, this.newAdult, this.newChild, "add");
+            this.$emit('tick_update', this.tickobj, this.newAdult, this.newChild, "fromSummary");
         },
         subChild(){
+            var ind = movie.giot(this.title);
+            this.newChild = movie.tickets[ind].tick_Child;
             this.newChild--;
             movie.ticketsBought--;
-            this.$emit('tick_update', this.tickobj, this.newAdult, this.newChild, "sub");
+            this.$emit('tick_update', this.tickobj, this.newAdult, this.newChild, "fromSummary");
         },
         remove(){
             this.$emit('tick_update', this.tickobj, this.newAdult, this.newChild, "delete");
@@ -143,14 +151,34 @@ Vue.component("movie",{
             rate(that.vote_average);
         },
         adultBought(){
+            // adult / child values are first set in the array from 'this.ticketAdult' variables
+            // they will update but when summary tries to grab them and update them it
+            // causes duplication of these variables
+            // this 'if' statement makes sure that if a value is in the summary array
+            // it then has to set the current value equal to that value in the array
+            // likewise, in the shopping cart its variable will also be checked the same way
+            try{
+                var ind = movie.giot(this.title);
+                this.ticketAdult = movie.tickets[ind].tick_Adult;
+            }
+            catch(error){
+                // console.log(error)
+            }
             this.ticketAdult++;
             movie.ticketsBought++;
-            this.$emit("secondadult", this.movObj, this.ticketAdult, this.ticketChild, "addA");
+            this.$emit("secondadult", this.movObj, this.ticketAdult, this.ticketChild, "fromMovie");
         },
         childBought(){
+            try{
+                var ind = movie.giot(this.title);
+                this.ticketChild = movie.tickets[ind].tick_Child;
+            }
+            catch(error){
+                // console.log(error)
+            }
             this.ticketChild++;
             movie.ticketsBought++;
-            this.$emit("secondchild", this.movObj, this.ticketAdult, this.ticketChild, "addC");
+            this.$emit("secondchild", this.movObj, this.ticketAdult, this.ticketChild, "fromMovie");
         },
     }
 })
@@ -169,7 +197,7 @@ const movie = new Vue({
         ticketsBought: 0,
 
         // final price of all adult + child tickets
-        totalAmount: 0.00,
+        totalAmount: "$0.00",
 
         // default values on load, should be changed asap to API
         pageTitle: "Upcoming Movies",
@@ -198,73 +226,59 @@ const movie = new Vue({
         .catch(error=>{console.log(error);})
     },
     methods:{
-        ticketCountUpdate(obj, adult, child, key){
-            switch(key) {
-                case 'addA':
-                    console.log(key)
-                    // this.tickets[this.giot()].addAdult++;
-                    break;
-                case 'addC':
-                    console.log(key)
-                    break;
-                case 'subA':
-                    console.log(key)
-                    break;
-                case 'subC':
-                    console.log(key)
-                    break;
-                default:
-                  console.log('Tick Count process started, but could no resolve');
-            }
-
-        },
         // Update total price of all tickets in cart
         getTotal(){
-            // Removes exponential growth
-            this.totalAmount=0;
-            for(i = 0; i < this.tickets.length; i++){
-                var adultPrices = this.tickets[i].tick_Adult*10.99;
-                var childPrices = this.tickets[i].tick_Child*4.99;
-                this.totalAmount += (adultPrices + childPrices);
+            // if no tickets in cart, return 0 to avoid error
+            try
+            {
+                if(this.tickets.length==0){throw "Error 1: No tickets in cart"}
+                // Removes exponential growth
+                this.totalAmount=0;
+                for(i = 0; i < this.tickets.length; i++){
+                    var adultPrices = this.tickets[i].tick_Adult*10.99;
+                    var childPrices = this.tickets[i].tick_Child*4.99;
+                    this.totalAmount += (adultPrices + childPrices);
+                }
+                // Convert num to string
+                var numStr = this.totalAmount.toString();
+
+                // Split string after decimal into array
+                var split = numStr.split('.');
+
+                // set whole number and decimal number into their own variables
+                var whole = split[0];
+                var decimal = split[1];
+
+                // remove everything after the first 2 decimals
+                decimal = decimal.slice(0, decimal.length - (decimal.length - 2));
+
+                // if only 1 decimal, add a 0
+                if(decimal.length==1){decimal+="0"}
+
+                // final output of total
+                return '$'+whole + "." + decimal;
             }
-            // Convert num to string
-            var numStr = this.totalAmount.toString();
-
-            // Split string after decimal into array
-            var split = numStr.split('.');
-
-            // set whole number and decimal number into their own variables
-            var whole = split[0];
-            var decimal = split[1];
-
-            // remove everything after the first 2 decimals
-            decimal = decimal.slice(0, decimal.length - (decimal.length - 2));
-
-            // if only 1 decimal, add a 0
-            if(decimal.length==1){decimal+="0"}
-
-            // final output of total
-            return '$'+whole + "." + decimal;
+            catch(error){
+                console.log(error)
+                return "$0.00";
+            }
         },
         // get index of ticket
         giot(title){
             // retunr index of movie in summary array
             for(i=0; i<this.tickets.length;i++){
-                if(this.tickets[i].title==title){
-                    var theIndex = i;
-                }
+                if(this.tickets[i].title==title){var theIndex = i;}
             }
             return theIndex;
         },
         deleteTicket(title){
             // Remove the amount of tickets from the ticket count
-            console.log("This index is at", this.giot(title))
             var tickCount = this.tickets[this.giot(title)].tick_Adult+this.tickets[this.giot(title)].tick_Child;
             this.ticketsBought-=tickCount;
             this.tickets.splice(this.giot(title),1);
         },
         updateCart(obj, adult, child, key){
-            console.log("Object:",obj,"\n"+"Adult:",adult+"\n"+"Child:",child+"\n"+"Key:",key)
+            console.log("Summary Object\n"+"• Object:",obj,"\n"+"• Adult:",adult+"\n"+"• Child:",child+"\n"+"• Key:",key)
             // Delete ticket from summary
             if(key=="delete"){this.deleteTicket(title);}
 
@@ -278,6 +292,7 @@ const movie = new Vue({
             title = obj.title;
             source = obj.poster_path;
 
+            // create ticket =object for summary
             var tick_obj = 
             {
                 poster_path: source,
@@ -287,11 +302,10 @@ const movie = new Vue({
                 id: 0
             }
 
-
+            // Any button that isn't the delete will update a ticket count in summary
             if(key!="delete"){
                 // Add ticket summary to BEGINNING of array
                 this.tickets.unshift(tick_obj);
-
                 var repeat = 0;
                 // check if current movie is already in summary
                 for(i=0; i < this.tickets.length; i++){
@@ -302,9 +316,11 @@ const movie = new Vue({
                         this.tickets[i].poster_path = source;
                         this.tickets[i].tick_Adult = adult;
                         this.tickets[i].tick_Child = child;
-                        // this.tickets[i].id = this.giot(title);
+                        this.tickets[i].id = i;
                         // Deletes the duplicate movie that would be added to summary
-                        if(repeat==2){this.tickets.shift();}
+                        if(repeat>=2){
+                            this.tickets.shift();
+                        }
                     }
                 }
                 
@@ -312,6 +328,7 @@ const movie = new Vue({
             
             // If both adult tickets, and child tickets are 0 then remove the movie from the summary
             if(adult==0 && child==0){
+                // console.log("both 0")
                 // check if adult is 0 first then delete
                 //check if child is 0 then delete
                 for(i=0; i<this.tickets.length; i++){
@@ -329,7 +346,7 @@ const movie = new Vue({
             if(this.ticketsBought>0){amt.style.transform = "scale(1.0)";}
             else{amt.style.transform = "scale(0.0)";}
             amt.innerHTML = this.ticketsBought;
-            this.getTotal();
+            this.totalAmount=this.getTotal();
         },
     }
 })
