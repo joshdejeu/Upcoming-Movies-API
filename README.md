@@ -1,4 +1,4 @@
-<a src="https://monopoly-game-javascript.pages.dev/">View Live Site</a>
+<a href="https://monopoly-game-javascript.pages.dev/">View Live Site</a>
 # Upcoming Movies API
 
 1. Use MovieDB API to get movie objects
