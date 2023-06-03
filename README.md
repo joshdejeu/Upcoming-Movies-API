@@ -1,4 +1,9 @@
-<a href="https://upcoming-movies-api.pages.dev/">View Live Site</a>
+<div align="center">
+  
+[![Button Shield]](https://upcoming-movies-api.pages.dev/)
+
+[Button Shield]: https://img.shields.io/badge/View_Live_Site-37a779?style=for-the-badge
+</div>
 
 ![Screenshot](https://i.postimg.cc/qqfPqKvQ/image.png)
 
