@@ -1,4 +1,7 @@
 <a href="https://upcoming-movies-api.pages.dev/">View Live Site</a>
+
+![Screenshot](https://i.postimg.cc/qqfPqKvQ/image.png)
+
 # Upcoming Movies API
 
 1. Use MovieDB API to get movie objects
